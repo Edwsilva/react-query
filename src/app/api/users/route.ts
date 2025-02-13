@@ -2,8 +2,12 @@ import {NextResponse} from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 // Define the User type
-interface User {
+export interface User {
   id: string;
   fullName: string;
   email: string;
@@ -36,6 +40,10 @@ export async function GET() {
     const filePath = await getUsersFilePath();
     const fileContent = await fs.readFile(filePath, "utf-8");
     const users: User[] = JSON.parse(fileContent);
+
+    await delay(1000);
+
+    // return NextResponse.json({error: "Forçando erro"}, {status: 500});
 
     return NextResponse.json(users);
   } catch (error) {
@@ -70,6 +78,8 @@ export async function POST(request: Request) {
 
     users.push(newUser);
     await fs.writeFile(filePath, JSON.stringify(users, null, 2));
+
+    await delay(1000);
 
     return NextResponse.json(newUser, {status: 201});
   } catch (error) {
