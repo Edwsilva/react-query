@@ -1,4 +1,4 @@
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
@@ -21,7 +21,7 @@ async function getUsersFilePath() {
     await fs.access(path.dirname(filePath));
   } catch {
     // Create the data directory if it doesn't exist
-    await fs.mkdir(path.dirname(filePath), {recursive: true});
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
   }
 
   try {
@@ -40,15 +40,24 @@ export async function GET() {
     const filePath = await getUsersFilePath();
     const fileContent = await fs.readFile(filePath, "utf-8");
     const users: User[] = JSON.parse(fileContent);
+    console.log("USERS em route.ts, ", users);
 
-    await delay(1000);
+    await delay(5000);
+    // para testar o
+    // queryClient.setQueryData(["users"], (users: User[] = []) => {
+    //    console.log("Lista anterior:", users);
+    //    return [...users, newUser];
+    //  }); no FRONT
 
-    // return NextResponse.json({error: "Forçando erro"}, {status: 500});
+    // return NextResponse.json({ error: "Forçando erro" }, { status: 500 });
 
     return NextResponse.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);
-    return NextResponse.json({error: "Failed to fetch users"}, {status: 500});
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
   }
 }
 
@@ -56,12 +65,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const {fullName, email} = body;
+    const { fullName, email } = body;
 
     if (!fullName || !email) {
       return NextResponse.json(
-        {error: "Full name and email are required"},
-        {status: 400}
+        { error: "Full name and email are required" },
+        { status: 400 }
       );
     }
 
@@ -81,9 +90,12 @@ export async function POST(request: Request) {
 
     await delay(1000);
 
-    return NextResponse.json(newUser, {status: 201});
+    return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     console.error("Error creating user:", error);
-    return NextResponse.json({error: "Failed to create user"}, {status: 500});
+    return NextResponse.json(
+      { error: "Failed to create user" },
+      { status: 500 }
+    );
   }
 }

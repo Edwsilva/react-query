@@ -17,6 +17,7 @@ import { User } from "../api/users/route";
 import { faker } from "@faker-js/faker";
 
 function fetcher(url: string) {
+  console.log("Estou no fetcher");
   return fetch(url).then((res) => res.json());
 }
 // fetcher é uma função simples para buscar dados de uma API usando o fetch. Ela retorna os dados no formato JSON.
@@ -35,7 +36,10 @@ export default function Users() {
   const queryClient = useQueryClient();
   const users = useQuery({
     queryKey: ["users"],
+    // Quando o componente monta, se enabled: true (padrão) e não houver cache válido → executa a queryFn.
     queryFn: () => fetcher("/api/users"),
+    //enabled: false, // não executa automaticamente
+    // refetchInterval: 1000, // a cada 5 segundos
   });
   // useQuery é usado para buscar os dados da API.
   // queryKey: ["users"]: O queryKey é usado para identificar essa consulta no cache do React Query.
@@ -58,7 +62,7 @@ export default function Users() {
         console.log("Lista anterior:", users);
         return [...users, newUser];
       });
-      // queryClient.setQueryData(["users"], ...) → vou atualizar o cache identificado pela query ["users"].
+      // queryClient.setQueryData(["users"], ...) → vou atualizar o cache identificado pela query ["users"].(Atualçizaçao otmista)
       // (users: User[] = []) => { ... } → recebo a lista atual de usuários, ou um array vazio se não existir nada no cache.
       // return [...users, newUser] → devolvo um novo array contendo os antigos + o novo usuário.
 
@@ -79,9 +83,10 @@ export default function Users() {
   //   queryClient.invalidateQueries: Invalidando a consulta ["users"] para forçar o React Query a buscar novamente os dados da API.
   //   Isso é útil para garantir que a lista de usuários seja revalida e reflita a nova alteração, especialmente se o cache estiver desatualizado.
 
-  if (users.isPending) return <div>Pendente...</div>;
+  if (users.isPending) return <div>Carregando...</div>;
 
-  if (users?.data?.error) return <div>Erro: {users.data.error}</div>;
+  if (users?.data?.error)
+    return <div>Erro ao carregar usuarios - {users.data.error}</div>;
 
   // if (!users.data?.length) return <div>Sem usuários</div>;
 
@@ -89,6 +94,11 @@ export default function Users() {
     <div>
       <button
         onClick={() =>
+          // Chama a funçao mutationFn: createUser,
+          // userMutation.mutate({
+          //   fullName: "Edwilson da Silva",
+          //   email: "edwsilva@gmail.com",
+          // })
           userMutation.mutate({
             fullName: faker.person.fullName(),
             email: faker.internet.email(),
@@ -104,7 +114,8 @@ export default function Users() {
             {user.fullName} / {user.email}
           </li>
         ))}
-        {users.isFetching && <li>Atualizando...</li>}
+        {/* Retirei apos a implementaçao do setQueryData() */}
+        {/* {users.isFetching && <li>Atualizando...</li>} */}
       </ul>
     </div>
   );
