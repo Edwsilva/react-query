@@ -93,16 +93,17 @@ export default function Users() {
   return (
     <div>
       <button
-        onClick={() =>
-          // Chama a funçao mutationFn: createUser,
+        onClick={
+          () =>
+            // Chama a funçao mutationFn: createUser,
+            userMutation.mutate({
+              fullName: "Edwilson da Silva",
+              email: "edwsilva@gmail.com",
+            })
           // userMutation.mutate({
-          //   fullName: "Edwilson da Silva",
-          //   email: "edwsilva@gmail.com",
+          //   fullName: faker.person.fullName(),
+          //   email: faker.internet.email(),
           // })
-          userMutation.mutate({
-            fullName: faker.person.fullName(),
-            email: faker.internet.email(),
-          })
         }
       >
         {userMutation.isPending ? "Criando..." : "Novo Usuário"}
